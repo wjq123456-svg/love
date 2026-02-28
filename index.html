@@ -357,6 +357,24 @@
             transform: scale(1.05) rotate(0deg);
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 107, 157, 0.4);
         }
+                /* 照片铺满背景 */
+        .bg-photo.fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            opacity: 0.5 !important;
+            transform: scale(1) !important;
+            animation: none !important;
+            filter: brightness(0.8) contrast(1.1) !important;
+            z-index: 0 !important;
+            transition: all 1.5s ease !important;
+        }
+
 
         @keyframes photoFloat {
             0%, 100% {
@@ -691,7 +709,27 @@
         // 关闭弹窗按钮
         closePopupBtn.addEventListener('click', function() {
             centerPopup.classList.remove('show');
-        });
+        });        // 照片铺满背景todo
+            function makePhotosFullscreen() {
+                const photos = document.querySelectorAll('.bg-photo');
+                photos.forEach((photo, index) => {
+                    setTimeout(() => {
+                        photo.classList.add('fullscreen');
+                    }, index * 200);
+                });
+            }
+
+            // "可以"按钮点击事件
+            yesBtn.addEventListener('click', function () {
+                // 照片铺满背景
+                makePhotosFullscreen();
+
+                // 延迟跳转到信封页面
+                setTimeout(() => {
+                    window.location.href = 'envelope.html';
+                }, 2500);
+            });
+
 
 
 
