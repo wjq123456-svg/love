@@ -546,6 +546,29 @@
                 height: 200px;
             }
         }
+
+
+        /* 移动端照片网格布局 */
+        @media (max-width: 768px) {
+            .background-photos {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-content: center;
+                gap: 10px;
+                padding: 20px;
+            }
+
+            .bg-photo {
+                position: relative !important;
+                width: 100px !important;
+                height: 130px !important;
+                left: auto !important;
+                top: auto !important;
+                transform: scale(0.8) !important;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -764,6 +787,13 @@
         function createBackgroundPhotos() {
             const container = document.getElementById('bgPhotos');
             const photoPaths = ['aa/1.jpg', 'aa/2.jpg', 'aa/3.jpg', 'aa/4.jpg', 'aa/5.jpg', 'aa/6.jpg', 'aa/7.jpg', 'aa/8.jpg', 'aa/9.jpg', 'aa/10.jpg', 'aa/11.jpg'];
+            
+            // 检测是否为移动端
+            const isMobile = window.innerWidth <= 768;
+            const photoWidth = isMobile ? 100 : 300;
+            const photoHeight = isMobile ? 130 : 400;
+            const minDistance = isMobile ? 80 : 200;
+            
             const usedPositions = [];
 
             for (let i = 0; i < photoPaths.length; i++) {
@@ -771,38 +801,48 @@
                 img.className = 'bg-photo';
                 img.src = photoPaths[i];
 
-                // 随机位置，但避免完全重叠
                 let left, top;
-                let attempts = 0;
-                const maxAttempts = 100;
 
-                do {
-                    left = Math.random() * (window.innerWidth - 300);
-                    top = Math.random() * (window.innerHeight - 400);
+                if (isMobile) {
+                    // 移动端：使用简单的网格布局，避免重叠
+                    const cols = 3;
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    left = col * (photoWidth + 10) + 20;
+                    top = row * (photoHeight + 10) + 50;
+                } else {
+                    // 桌面端：随机位置，避免重叠
+                    let attempts = 0;
+                    const maxAttempts = 100;
 
-                    // 检查是否与已有照片重叠
-                    let overlapping = false;
-                    for (const pos of usedPositions) {
-                        const distance = Math.sqrt(Math.pow(left - pos.left, 2) + Math.pow(top - pos.top, 2));
-                        if (distance < 200) {
-                            overlapping = true;
+                    do {
+                        left = Math.random() * (window.innerWidth - photoWidth);
+                        top = Math.random() * (window.innerHeight - photoHeight);
+
+                        let overlapping = false;
+                        for (const pos of usedPositions) {
+                            const distance = Math.sqrt(Math.pow(left - pos.left, 2) + Math.pow(top - pos.top, 2));
+                            if (distance < minDistance) {
+                                overlapping = true;
+                                break;
+                            }
+                        }
+
+                        if (!overlapping) {
+                            usedPositions.push({ left, top });
                             break;
                         }
-                    }
 
-                    if (!overlapping) {
-                        usedPositions.push({ left, top });
-                        break;
-                    }
-
-                    attempts++;
-                } while (attempts < maxAttempts);
+                        attempts++;
+                    } while (attempts < maxAttempts);
+                }
 
                 img.style.left = left + 'px';
                 img.style.top = top + 'px';
                 container.appendChild(img);
             }
         }
+
 
         // 创建星星背景
         function createStars() {
@@ -829,7 +869,7 @@
             photos.forEach((photo, index) => {
                 setTimeout(() => {
                     photo.classList.add('visible');
-                }, index * 1500);
+                }, index * 2000);
             });
         }
 
